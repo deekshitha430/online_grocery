@@ -1,0 +1,29 @@
+{% set curPage = 'home' %}
+{% set title = 'home' %}
+
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+
+<main class="vh-100">
+
+  <section class="all-categories container-fluid mb-5" id="all-categories">
+    <h3 class="text-success text-center my-5">Sub Categories for  "{{category['name']}}"</h3>
+    <div class="d-flex flex-wrap gap-3 justify-content-center">
+      {% for item in sub_categories %}
+      <div class="card" style="width: 18rem;">
+        <img src="../../static/images/uploads/sub_categories/{{item['img_file_name']}}" class="card-img-top" alt="...">
+        <div class="card-body">
+          <h6 class="card-title text-center mb-3">{{item['name']}}</h6>
+          <a href="/products/?scid={{item['_id']}}" class="btn btn-sm btn-outline-success w-100">View Products<i></i></a>
+        </div>
+      </div>
+      {% endfor %} 
+    </div>
+  </section>
+
+ 
+</main>
+
+
+{% endblock %}

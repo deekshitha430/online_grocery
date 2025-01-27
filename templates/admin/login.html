@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Food World - Admin Login</title>
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+  integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="{{url_for('static', filename='css/admin.css')}}">
+</head>
+<body>
+
+  <div class="container login d-flex justify-content-center align-items-center">
+    <div class="card shadow" style="width:28rem;">
+      <div class="card-header secondary-bg">
+        <h4 class="card-title text-center text-light">Admin Login</h4>
+      </div>
+      <div class="card-body p-4">
+        <h5 class="text-danger">{{msg}}</h5>
+        <form action="{{request.url}}" method="POST" id="admin-login-form">
+          <div class="mb-3">
+            <label for="user_name" class="form-label">User Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" id="user_name" name="user_name" value="{{values['user_name']}}" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label for="password" class="form-label">Password <span class="text-danger">*</span></label>
+            <input type="password" class="form-control" id="password" name="password" required>
+          </div>
+          <button type="submit" class="btn btn-primary w-100 secondary-bg">Login</button>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<!-- jQuery CDN  -->
+<script src="https://code.jquery.com/jquery-3.6.1.min.js"
+integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+  <!-- Bootstrap bundle js -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+  integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+  crossorigin="anonymous"></script>
+  <!-- jQuery validation -->
+  <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js"></script>
+  <script src="{{url_for('static', filename='scripts/validation.js')}}"></script>
+</body>
+</html>

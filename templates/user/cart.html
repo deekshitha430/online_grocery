@@ -1,0 +1,198 @@
+{% set curPage = 'menus' %}
+{% set title = 'Menus' %}
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+<div class="container-fluid bg-white my-2 p-4">
+  <fieldset class="cart border m-auto p-2 px-4">
+    <legend class="float-none w-auto p-1"><i class="fa fa-cart-shopping"></i> Cart Details</legend>
+    <a href="/" class="btn btn-sm btn-success mb-4"> <i class="fa fa-shopping-basket me-2"></i> Continue Shopping </a>
+    <form action="/checkout/" method="POST">
+
+      <div class="row">
+        <div class="col-sm-8">
+          <h5 class="mb-4">Order</h5>
+
+          <table class="table mb-5 border">
+            <thead class="text-center">
+              <th>Description</th>
+              <th>Price</th>
+              <th style="width:14%;">Quantity</th>
+              <th>Remove</th>
+              <th style="width:18%;">Total</th>
+            </thead>
+            <tbody>
+              {% for item in cart %}
+
+              <tr class="text-center">
+                <td class="d-flex align-items-center gap-3">
+                  <img src="../../../static/images/uploads/products/{{item['img_file_name']}}"
+                    style="width: 80px;height:60px;" alt="" class="">
+                  <span>{{item['product_title']}}</span>
+                  <input type="hidden" name="product_id" value="{{item['_id']}}">
+                </td>
+                <td>
+                  $&nbsp;{{'%0.2f'|format(item['price'])}}
+                  <input type="hidden" name="price" value="{{item['price']}}">
+                </td>
+                <td>
+                  <input type="number" min="1" name="quantity" id="quantityInp" value="{{item['quantity']}}" class="form-control"
+                    onchange="updateCartQuantity(`{{item['_id']}}`,this.value)">                
+                </td>
+                <td>
+                  <a href="/remove-item-cart/{{item['_id']}}/" class="btn btn-sm btn-danger">x</a>
+                </td>
+                <td>
+                  <span id="disp_amt">$&nbsp;{{'%0.2f'|format(item['amount'])}}</span>
+                  <input type="hidden" name="amount" id="inp_amt" value="{{item['amount']}}">
+                </td>
+              </tr>
+              {% endfor %}
+              <tr class="text-center">
+                <td colspan="4" class="text-end">Order Total</td>
+                <td class="">
+                  $&nbsp;{{'%0.2f'|format(itemsTotalAmt)}}
+                  <input type="hidden" name="itemsTotalAmt" value="{{itemsTotalAmt}}">
+                </td>
+              </tr>
+              <tr class="text-center">
+                {% if session["delivery"] %}
+                <td colspan="4" class="text-end">Delivery Charge</td>
+                <td>
+                  $ {{'%0.2f'|format(deliveryCharge)}}
+                  <input type="hidden" name="deliveryCharge" value="{{deliveryCharge}}">                  
+                </td>
+                {% endif %}
+              </tr>
+              <tr class="text-center">
+                <td colspan="4" class="text-end">Tax</td>
+                <td>
+                  $ {{'%0.2f'|format(taxAmount)}}
+                  <input type="hidden" name="taxAmount" value="{{taxAmount}}">                  
+                  <input type="hidden" name="taxPercentage" value="{{taxPercentage}}">                  
+                </td>
+              </tr>
+              <tr class="text-center">
+                <td colspan="4" class="text-end fs-5">Order Total Amount</td>
+                <td>
+                  <span class="fs-5">$ {{'%0.2f'|format(orderAmount)}}</span>                  
+                  <input type="hidden" name="orderAmount" value="{{orderAmount}}">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="col-sm-4">          
+          <h5 class="mb-4">Order Type</h5>
+          <div class="mb-3">
+            <div class="order-type-radio mb-4">
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="orderType" id="Pickup" value="Pickup" {{'checked' if not session['delivery']}}>
+                <label class="form-check-label" for="Pickup">Pickup</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="orderType" id="Delivery" value="Delivery" {{'checked' if session['delivery']}}>
+                <label class="form-check-label" for="Delivery">Delivery</label>
+              </div>
+            </div>
+            {% if session['delivery']%}
+            <div class="mb-4" id="delivery_address">
+              <label for="deliveryAddress" class="form-label">Delivery Address</label>
+              <textarea name="deliveryAddress" id="deliveryAddress" class="form-control w-100" cols="30" rows="2"
+              {{'required' if session['delivery']}}>{{session['user']['address']}}</textarea>
+            </div>
+            {% endif %}
+          </div>
+
+          <h5 class="mb-4">Payment Information</h5>
+          <div class="card-details border p-4 mb-4" id="cardDetails">
+            <div class="mb-4">
+              <label for="cardHolderName" class="form-label required">Card Holder Name</label>
+              <input type="text" class="form-control" name="cardHolderName" id="cardHolderName" required>
+            </div>
+            <div class="mb-4">
+              <label for="cardNumber" class="form-label required">Card Number</label>
+              <input type="text" class="form-control" name="cardNumber" id="cardNumber" required>
+            </div>
+            <div class="row g-1">
+              <div class="col-3">
+                <label for="expMonth" class="form-label required">Month</label>
+                <select name="expMonth" id="expMonth" class="form-control" required>
+                  {% for month in months %}
+                  <option>{{month}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-3 me-4">
+                <label for="expYear" class="form-label required">Year</label>
+                <select name="expYear" id="expYear" class="form-control" required>
+                  {% for year in years %}
+                  <option>{{year}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-5">
+                <label for="cvv" class="form-label required">CVV</label>
+                <input type="text" class="form-control" name="cvv" id="cvv" required>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-success w-100">CHECKOUT</button>
+
+        </div>
+      </div>
+
+    </form>
+  </fieldset>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateCartQuantity(product_id, quantity) {
+    post("/cart/update/", { product_id: product_id, quantity: quantity })
+  }
+
+  $(document).ready(function () {
+
+    $('input[name="orderType"]').change(function () {
+      $("#delivery_address").toggle();      
+      if ($(this).val() === 'Pickup') {        
+        $("#deliveryAddress").removeAttr("required");
+      }
+      else {
+        $("#deliveryAddress").attr("required", "required");
+      }
+      //Update delivery session
+      $.post("/update-delivery-session/",function(data){
+        if(data)
+        {
+          window.location.reload();
+        }
+      });
+    });
+
+    $("input[name='paymentType']").change(function () {
+      if ($(this).val() === "Cash") {
+        $("#cardDetails").addClass("d-none");
+        $("#cardHolderName").removeAttr("required");
+        $("#cardNumber").removeAttr("required");
+        $("#expMonth").removeAttr("required");
+        $("#expYear").removeAttr("required");
+        $("#cvv").removeAttr("required");
+      }
+      else {
+        $("#cardDetails").removeClass("d-none");
+        $("#cardHolderName").attr("required", "required");
+        $("#cardNumber").attr("required", "required");
+        $("#expMonth").attr("required", "required");
+        $("#expYear").attr("required", "required");
+        $("#cvv").attr("required", "required");
+      }
+    })
+
+  })
+</script>
+{% endblock %}

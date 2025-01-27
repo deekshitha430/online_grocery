@@ -1,0 +1,150 @@
+{% set curPage = 'orders' %}
+{% set title = 'Order Details' %}
+{% set orderType = request.args.get('order-type') %}
+{% set orderStatus = request.args.get('order-status') %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-2 my-2">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Orders</li>
+    </ol>
+  </nav>
+
+  <div class="order-details p-3">
+    <div class="row">
+      <div class="col-sm-4">
+        <ul class="list-unstyled">
+          <li class="mb-2">Order Id : <strong># {{order['_id']}}</strong></li>
+          <li class="mb-2">Order Status : {{OrderStatus(order['order_status']).name | replace("_", " ")}}</li>
+          <li class="mb-1">Order Type : {{order['order_type']}}</li>
+          <li class="mb-1">Order Amount : $ {{order['order_amount']}}</li>
+        </ul>
+        <hr />
+        <h6 class="mt-4 mb-2 fw-bold">Customer Details</h6>
+        <ul class="list-unstyled">
+          <li class="mb-2">Name : {{order['user'][0]['full_name']}}</li>
+          <li class="mb-1">Contact No. : {{order['user'][0]['mobile_no']}}</li>
+          {% if order['order_type'] == "Delivery"%}
+          <li class="mb-1">Address : {{order['delivery_address']}}</li>
+          {% endif %}
+        </ul>
+        <hr />
+        <h6 class="mt-4 mb-2 fw-bold">Payment Details</h6>
+        <ul class="list-unstyled">
+          <li class="mb-1">Payment Type : {{order['payment'][0]['payment_type']}}</li>
+          <li class="mb-2">Payment Status : {{order['payment'][0]['payment_status']}}</li>
+          {% if order['payment'][0]['cancellation_charge'] %}
+          <li class="mb-1">Order Cancellation Fee : $ {{'%0.2f'%order['payment'][0]['cancellation_charge']|float}}</li>
+          <li class="mb-1">Refund Amount : $ {{'%0.2f'%order['payment'][0]['refund_amount']|float}}</li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="col-sm-8">
+
+        {% if order['order_status'] != OrderStatus['DELIVERED'].value and order['order_status'] != OrderStatus['PICKED_UP'].value and order['order_status'] != OrderStatus['CANCELLED'].value %}
+        <h6 class="fw-bold mt-2 mb-4">Update Status</h6>
+        <div class="d-flex justify-content-between">
+          <h6>Update as : 
+            {% if order['order_status'] == OrderStatus['PENDING'].value %}
+            <button onclick="updateOrderStatus(`{{OrderStatus['CONFIRMED'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(2).name}}</button>
+            {% endif %}
+            {% if order['order_status'] == OrderStatus['CONFIRMED'].value %}
+            <button onclick="updateOrderStatus(`{{OrderStatus['PACKING'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(3).name}}</button>
+            {% endif %}
+            {% if order['order_status'] == OrderStatus['PACKING'].value %}
+            <button onclick="updateOrderStatus(`{{OrderStatus['READY'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(4).name}}</button>
+            {% endif %}
+            <!-- If Delivery -->
+            {% if order["order_type"] == "Delivery" %}
+              {% if order['order_status'] == OrderStatus['READY'].value %}
+              <button onclick="updateOrderStatus(`{{OrderStatus['OUT_FOR_DELIVERY'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(5).name | replace("_", " ")}}</button>
+              {% endif %}
+              {% if order['order_status'] == OrderStatus['OUT_FOR_DELIVERY'].value %}
+              <button onclick="updateOrderStatus(`{{OrderStatus['DELIVERED'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(6).name}}</button>
+              {% endif %}
+            {% endif %}
+            <!-- /EndIf Delivery -->
+            <!-- If Pickup -->
+            {% if order["order_type"] == "Pickup" %}
+              {% if order['order_status'] == OrderStatus['READY'].value %}
+              <button onclick="updateOrderStatus(`{{OrderStatus['READY_TO_PICKUP'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(7).name | replace("_", " ")}}</button>
+              {% endif %}
+              {% if order['order_status'] == OrderStatus['READY_TO_PICKUP'].value %}
+              <button onclick="updateOrderStatus(`{{OrderStatus['PICKED_UP'].value}}`,`{{order['_id']}}`)" class="btn btn-sm btn-outline-success" >{{OrderStatus(8).name}}</button>
+              {% endif %}
+            {% endif %}
+            <!-- /EndIf Pickup -->
+          </h6>
+          <h6>Current Status : {{OrderStatus(order['order_status']).name | replace("_", " ")}}</h6>          
+        </div>
+
+        <hr>
+
+        {% endif %}        
+
+        <h6 class="fw-bold mt-2 mb-4">Ordered Items</h6>
+        <table class="table table-bordered">
+          <thead>
+            <th>#</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+          </thead>
+          <tbody>
+            {% for item in orderedItems %}
+            <tr>
+              <td>{{loop.index}}</td>
+              <td>{{item['product'][0]['product_title']}}</td>
+              <td>{{item['quantity']}}</td>
+              <td>$&nbsp;{{'%0.2f'%item['price']|float}}</td>
+              <td>$&nbsp;{{'%0.2f'%item['amount']|float}}</td>
+            </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="4" class="text-end">Total</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['items_total_amt']|float}}</td>
+            </tr>
+            <tr>
+              <td colspan="4" class="text-end">Tax</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['tax_amount']|float}}</td>
+            </tr>
+            {% if order['payment'][0]['delivery_charge'] %}
+            <tr>
+              <td colspan="4" class="text-end">Delivery Charge</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['delivery_charge']|float}}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td colspan="4" class="text-end">Grand Total</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['order_amount']|float}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+  
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateOrderStatus(status, order_id) {
+    $.post("/admin/update-order-status/",
+      { order_id: order_id, status: status },
+      function (result) {
+        if (result) {
+          window.location.reload();
+        }
+      });
+  }
+</script>
+{% endblock %}

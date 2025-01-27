@@ -1,0 +1,76 @@
+{% set curPage = 'saveProduct' %}
+{% set title = 'Update' if product else 'Add' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-4 my-2">
+
+  <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="/admin/products/" class=" text-decoration-none">Products</a></li>
+      <li class="breadcrumb-item active" aria-current="page">View Product</li>
+    </ol>
+  </nav>
+
+  <div class="mt-2">
+    <fieldset class="border p-2">
+      <legend class="float-none w-auto p-2 fs-5">View Product</legend>
+
+      <div class="row  mb-3">
+
+        <div class="col-sm-8">
+          <h5>{{product['product_title']}}</h5>
+
+          <div class="my-4">
+            <h4 class="d-flex">
+              <span>Price : ${{product['price']}} / M.R.P : ${{product['mrp']}}</span>
+            </h4>
+          </div>
+
+          <div>
+            <h5>Description</h5>
+            <p>{{product['description']}}</p>
+          </div>
+        </div>
+
+        <div class="col-sm-4">
+          <img src="{{url_for('static', filename='images/uploads/products/'+product['img_file_name'])}}" alt="" style="width: 100%;height:300px;">
+        </div>
+
+      </div>
+
+      <div>
+        <h5>Ratings & Reviews</h5>
+        <div class="d-flex">
+          {% for review in product["reviews"] %}
+          <div class="border p-3" style="width: 18rem;">
+            <div class="star-rating mb-3">
+              <input type="radio" id="5-stars-{{loop.index}}" name="rating_{{loop.index}}" value="5" {{'checked' if review['rating']==5}} />
+              <label for="5-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="4-stars-{{loop.index}}" name="rating_{{loop.index}}" value="4" {{'checked' if review['rating']==4}} />
+              <label for="4-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="3-stars-{{loop.index}}" name="rating_{{loop.index}}" value="3" {{'checked' if review['rating']==3}} />
+              <label for="3-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="2-stars-{{loop.index}}" name="rating_{{loop.index}}" value="2" {{'checked' if review['rating']==2}} />
+              <label for="2-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="1-stars-{{loop.index}}" name="rating_{{loop.index}}" value="1" {{'checked' if review['rating']==1}} />
+              <label for="1-stars-{{loop.index}}" class="star">&#9733;</label>
+            </div>
+            <div>
+              <q>{{review['review']}}</q>
+              <div class="text-end"> - {{review['user']['full_name']}}</div>
+            </div>
+          </div>
+          {%  endfor %}
+        </div>
+      </div>
+
+    </fieldset>
+  </div>
+
+</div>
+
+{% endblock %}

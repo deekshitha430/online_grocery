@@ -1,0 +1,61 @@
+{% set curPage = 'dashboard' %}
+{% set title = 'dashboard' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-4 my-2">
+
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+    </ol>
+  </nav>
+
+  <div class="row mb-4">
+    <div class="col-sm-4">
+      <div class="dashboard text-center border rounded-pill bg-primary p-3 text-light">
+        <h5>Total Products</h5>
+        <h5>{{dashboard["total_products"]}}</h5>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="dashboard text-center border rounded-pill bg-danger p-3 text-light">
+        <h5>Products Out Of Stock</h5>
+        <h5>{{dashboard["out_of_stock"]}}</h5>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="dashboard text-center border rounded-pill bg-primary p-3 text-light">
+        <h5>Registered Users</h5>
+        <h5>{{dashboard["reg_users"]}}</h5>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-4">
+      <div class="dashboard text-center border rounded-pill bg-success p-3 text-light">
+        <h5>Total Orders</h5>
+        <h5>{{dashboard["total_orders"]}}</h5>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="dashboard text-center border rounded-pill bg-danger p-3 text-light">
+        <h5>Cancelled Orders</h5>
+        <h5>{{dashboard["cancelled_orders"]}}</h5>
+      </div>
+    </div>
+    <div class="col-sm-4">
+      <div class="dashboard text-center border rounded-pill bg-success p-3 text-light">
+        <h5>Completed Orders</h5>
+        <h5>{{dashboard["completed_orders"]}}</h5>
+      </div>
+    </div>
+    
+  </div>
+
+</div>
+
+{% endblock %}

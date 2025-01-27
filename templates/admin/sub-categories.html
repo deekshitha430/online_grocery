@@ -1,0 +1,96 @@
+{% set curPage = 'categories' %}
+{% set title = 'categories' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb mt-2">
+    <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/categories/" class=" text-decoration-none">Categories</a></li>
+    <li class="breadcrumb-item active" aria-current="page">sub categories</li>
+  </ol>
+</nav>
+
+<fieldset class="border bg-light mb-5 pb-4">
+  <legend class="float-none w-auto p-2 fs-6">{{'Update' if sub_category else 'Add'}} Sub Category for <strong>" {{category['name']}} "</strong>
+  </legend>
+  <form action="/admin/sub-categories/" method="POST" enctype="multipart/form-data">
+    <div class="row g-3 align-items-center justify-content-center">
+      <div class="col-auto">
+        <label for="name" class="col-form-label">Name</label>
+      </div>
+      <div class="col-auto">
+        <input type="text" name="name" id="name" class="form-control" value="{{sub_category['name']}}" required
+          placeholder="Sub Category name" autocomplete="off">
+      </div>
+      <div class="col-auto">
+        <label for="image" class="col-form-label">Image</label>
+      </div>
+      <div class="col-auto">
+        <input type="file" name="image" id="image" class="form-control" {{'required' if not sub_category}}
+          placeholder="Sub Category Image">
+        <input type="hidden" name="img_file_name" value="{{sub_category['img_file_name']}}">
+      </div>
+      <div class="col-auto">
+        <input type="hidden" name="category_id" value="{{category['_id']}}">
+        <input type="hidden" name="sub_category_id" value="{{sub_category['_id']}}">
+        <button class="btn btn-sm btn-success">Save</button>
+      </div>
+      {% if sub_category %}
+      <div class="col-auto">
+        <a href="/admin/sub-categories/?cid={{category['_id']}}" class="btn btn-sm btn-warning">Cancel</a>
+      </div>
+      {% endif %}
+    </div>
+  </form>
+</fieldset>
+
+<fieldset class="border bg-light mb-2 shadow p-3">
+  <legend class="float-none w-auto p-2 fs-6">Sub Category List</legend>
+  <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+      <thead>
+        <tr class="primary-bg text-light">
+          <td style="width:10%">S.No</td>
+          <td style="width:10%">Image</td>
+          <td>Category</td>
+          <td>Sub Category</td>
+          <td style="width: 10%;">Action</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for sub_cat in sub_categories %}
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>
+            <img src="../../static/images/uploads/sub_categories/{{sub_cat['img_file_name']}}" alt="category"
+              style="width:100%">
+          </td>
+          <td>{{sub_cat['category'][0]['name']}}</td>
+          <td>{{sub_cat['name']}}</td>
+          <td>
+            <a href="/admin/edit-sub-category/?cid={{category['_id']}}&scid={{sub_cat['_id']}}" class="btn btn-sm btn-info" title="Edit category">
+              <i class="fas fa-edit fa-fw"></i>
+            </a>
+            <a href="/admin/delete-sub-category/?cid={{category['_id']}}&scid={{sub_cat['_id']}}"
+              onclick="return confirm('Are you sure to delete this Sub category?')" class="btn btn-sm btn-danger"
+              title="Delete category">
+              <i class="fas fa-close fa-fw"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</fieldset>
+
+
+
+
+
+
+
+{% endblock %}

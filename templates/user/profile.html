@@ -1,0 +1,46 @@
+{% set curPage = 'profile' %}
+{% set title = 'Profile' %}
+
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+
+<div class="container content bg-light p-4 my-4">
+
+  <fieldset class="user-register border w-50 m-auto p-3">
+    <legend class="float-none w-auto p-2">Update your profile</legend>
+    <form action="/profile/" method="POST" id="user-profile">
+
+      <div class="mb-3">
+        <label for="full_name" class="form-label required">Full Name</label>
+        <input type="text" name="full_name" id="full_name" value="{{customer['full_name']}}" class="form-control"
+          required>
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label required">Email</label>
+        <input type="text" name="email" id="email" value="{{customer['email']}}" class="form-control"
+          readonly>
+      </div>
+
+      <div class="mb-3">
+        <label for="mobile_no" class="form-label required">Mobile Number</label>
+        <input type="text" name="mobile_no" id="mobile_no" value="{{customer['mobile_no']}}" class="form-control"
+          required>
+      </div>
+
+      <div class="mb-3">
+        <label for="address" class="form-label required">Address</label>
+        <textarea name="address" id="address" cols="30" rows="2" class="form-control"
+          required>{{customer['address']}}</textarea>
+      </div>
+
+      <input type="hidden" name="customerId" value="{{customer['_id']}}">
+      <button type="submit" class="btn btn-success w-100 mb-3">Save Profile</button>
+
+    </form>
+  </fieldset>
+</div>
+
+
+{% endblock %}

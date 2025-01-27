@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GROCERIES - {{title|upper}}</title>
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- jQuery dataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
+    <!-- Font Awsome CSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+      integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{url_for('static', filename='css/admin.css')}}">
+  </head>
+
+  <body>
+
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar starts here -->
+      <div class="" id="sidebar-wrapper">
+        <div class="sidebar-heading text-center py-2 primary-text fs-4 fw-bold text-uppercase">
+          <i class="fas fa-leaf me-2"></i> <span class="d-inline-block">Groceries</span>
+        </div>
+        <div class="list-group list-group-flush my-3">
+          <a href="/admin/dashboard"
+            class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'dashboard'}}">
+            <i class="fas fa-tachometer-alt fa-fw me-2"></i> Dashboard
+          </a>
+          <a href="/admin/categories/" class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'categories'}}">
+            <i class="fas fa-store-alt fa-fw me-2"></i> Categories
+          </a>
+          <a href="/admin/charges/" class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'charges'}}">
+            <i class="fas fa-dollar fa-fw me-2"></i> Charges
+          </a>
+          <a href="/admin/products/" class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'products'}}">
+            <i class="fas fa-sprout fa-fw me-2"></i> Products
+          </a>
+          <a href="/admin/orders/" class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'orders'}}">
+            <i class="fas fa-braille fa-fw me-2"></i> Orders
+          </a>
+          <a href="/admin/users/" class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'users'}}">
+            <i class="fas fa-users fa-fw me-2"></i> Customers
+          </a>
+          <a href="/admin/transactions/" class="list-group-item list-group-item-action bg-transparent primary-text fw-bold {{'active' if curPage == 'transactions'}}">
+            <i class="fas fa-arrow-down-a-z fa-fw me-2"></i> Transactions
+          </a>
+        </div>
+      </div>
+      <!-- Sidebar ends here -->
+
+      <div id="page-content-wrapper">
+
+        <nav class="navbar navbar-expand-md navbar-light bg-transparent py-3 border-bottom">
+          <div class="container-fluid">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-align-left primary-main-text fs-4 me-3" id="menu-toggle"></i>
+              <h3 class="h3 mb-0 text-capitalize second-main-text">{{title}}</h3>
+            </div>
+
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+              data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
+              aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item dropdown dropstart">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                    data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-user me-2"></i> {{session['user']['user_name']}}
+                  </a>
+                  <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <li><a class="dropdown-item" href="/admin/change-password">Change Password</a></li>
+                    <li>
+                      <hr class="dropdown-divider">
+                    </li>
+                    <li><a class="dropdown-item" href="/admin/logout">Logout</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        <div class="container-fluid">
+
+          {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+          {% for category,message in messages %}
+          <div class="alert alert-{{category}} alert-dismissible fade show" role="alert">
+            <strong><em>{{message}}</em></strong>.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+          {% endif %}
+          {% endwith %}
+
+          {% block content %}
+
+          {% endblock%}
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- jQuery CDN  -->
+    <script src="https://code.jquery.com/jquery-3.6.1.min.js"
+      integrity="sha256-o88AwQnZB+VDvE9tvIXrMQaPlFFSUTR+nldQm1LuPXQ=" crossorigin="anonymous"></script>
+    <!-- Bootstrap bundle js -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"></script>
+    <!-- JQuery Datatables -->
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+    <!-- jQuery validation -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.2/dist/jquery.validate.min.js"></script>
+    <script src="{{url_for('static',filename='scripts/validation.js')}}"></script>
+    <script>
+      var el = document.getElementById('wrapper')
+      var toggleButton = document.getElementById('menu-toggle')
+
+      toggleButton.onclick = function () {
+        el.classList.toggle('toggled')
+      }
+
+      $(document).ready(function () {
+
+        $('#table').DataTable({
+          "pageLength": 25,
+          "columnDefs": [{
+            "searchable": false,
+            "targets": 0
+          }]
+        });
+
+      });
+    </script>
+
+    {% block scripts%}
+    {% endblock %}
+  </body>
+
+</html>

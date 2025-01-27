@@ -1,0 +1,45 @@
+{% set curPage = 'charges' %}
+{% set title = 'Charges' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb mt-2">
+    <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">charges</li>
+  </ol>
+</nav>
+
+<fieldset class="border bg-light mb-5 pb-4">
+  <legend class="float-none w-auto p-2 fs-6">Update Charges</legend>
+  <form action="/admin/charges/" method="POST" enctype="multipart/form-data">
+    <div class="p-3 w-50">
+      <div class="mb-3">
+        <label for="name" class="col-form-label">Delivery</label>
+        <input type="text" name="delivery" id="delivery" class="form-control" value="{{charge['delivery']}}" required
+          placeholder="Delivery Charge" autocomplete="off">
+      </div>
+      <div class="mb-3">
+        <label for="tax" class="col-form-label">Tax (%)</label>
+        <input type="text" name="tax" id="tax" class="form-control" value="{{charge['tax']}}" required
+          placeholder="Tax Percentage" autocomplete="off">
+      </div>
+      <div class="mb-3">
+        <label for="cancellation" class="col-form-label">Cancellation (%)</label>
+        <input type="text" name="cancellation" id="cancellation" class="form-control" value="{{charge['cancellation']}}" required
+          placeholder="Cancellation Percentage" autocomplete="off">
+      </div>
+      <div class="">
+        <input type="hidden" name="charge_id" value="{{charge['_id']}}">
+        <button class="btn btn-sm btn-success w-100">Update Charges</button>
+      </div>
+    </div>
+  </form>
+</fieldset>
+
+
+
+
+{% endblock %}

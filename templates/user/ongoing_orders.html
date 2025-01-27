@@ -1,0 +1,52 @@
+{% set curPage = 'ongoingOrders' %}
+{% set title = 'Ongoing Orders' %}
+
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+
+<main class="bg-light container py-4">
+  <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/user/" class=" text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Ongoing Orders</li>
+    </ol>
+  </nav>
+  <h4 class="page-title ">{{title}}</h4>
+
+  <div class="table-responsive table-orders">
+    <table class="table table-bordered" id="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Order Id</th>
+          <th>Ordered On</th>
+          <th>Amount</th>
+          <th>Payment Type</th>
+          <th>Payment Status</th>
+          <th>Order Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>
+            <a href="/order-details/{{order['_id']}}">{{order['_id']}}</a>
+          </td>
+          <td>{{order['order_date_time'].strftime('%Y-%m-%d %I:%M %p')}}</td>
+          <td>$&nbsp;{{order['order_amount']}}</td>
+          <td>{{order['payment'][0]['payment_type']}}</td>
+          <td>{{order['payment'][0]['payment_status']}}</td>
+          <td>{{OrderStatus(order['order_status']).name | replace("_", " ")}}</td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+{% endblock %}

@@ -1,0 +1,50 @@
+{% set curPage = 'transactions' %}
+{% set title = 'All Transactions' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-2 my-2">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Transactions</li>
+    </ol>
+  </nav>
+
+  <div class="table-responsive my-4">
+    <table class="table table-bordered bg-" id="table">
+      <thead>
+        <tr class="primary-bg text-light">
+          <th>#</th>
+          <th>Order Id</th>
+          <th>Order Date</th>
+          <th>Order Amount</th>
+          <th>Refund Amount</th>
+          <th>Amount Credited</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in transactions %}
+        {% set order_mount = float(item['order_amount'])%}
+        {% set refund_amount = float(item['payment_list'][0]['refund_amount'] if item['payment_list'][0]['refund_amount'] else 0) %}
+        {% set credit_amount = order_mount - refund_amount%}
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>
+            <a href="/admin/order-details/{{item['_id']}}">{{item['_id']}}</a>
+          </td>
+          <td>{{item['order_date_time']}}</td>
+          <td>$ {{'%0.2f'%item['order_amount'] | float}}</td>
+          <td>$ {{'%0.2f'%refund_amount | float}}</td>
+          <td>$ {{'%0.2f'%credit_amount | float}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+{% endblock %}

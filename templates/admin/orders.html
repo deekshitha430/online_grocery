@@ -1,0 +1,99 @@
+{% set curPage = 'orders' %}
+{% set title = 'Orders' %}
+{% set orderType = request.args.get('order-type') %}
+{% set orderStatus = request.args.get('order-status') %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-2 my-2">
+  <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Orders</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-center gap-2">
+    <a href="/admin/orders/?order-type=Delivery"
+      class="btn btn-sm {{'btn-success' if orderType == 'Delivery' else 'btn-outline-success'}}">
+      <span>DELIVERY</span>
+      <span class="badge bg-danger rounded-pill">{{deliveryCount}}</span>
+    </a>
+
+    <a href="/admin/orders/?order-type=Pickup"
+      class="btn btn-sm {{'btn-success' if orderType == 'Pickup' else 'btn-outline-success'}}">
+      <span>PICKUP</span>
+      <span class="badge bg-danger rounded-pill">{{pickupCount}}</span>
+    </a>
+
+    <a href="/admin/orders/?order-status={{OrderStatus['CANCELLED'].value}}"
+      class="btn btn-sm {{'btn-danger' if orderStatus == '9' else 'btn-outline-danger'}}">CANCELLED ORDERS</a>
+
+    <a href="/admin/orders/"
+      class="btn btn-sm {{'btn-success' if not orderType and not orderStatus else 'btn-outline-success'}}">ALL
+      ORDERS</a>
+  </div>
+
+  <div class="table-responsive table-orders">
+    <table class="table table-bordered" id="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Order Id</th>
+          <th>Ordered On</th>
+          <th>Order Amount</th>
+          <th>Payment Type</th>
+          <th>Payment Status</th>
+          <th>Order Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in orders %}
+
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>
+            <a href="/admin/order-details/{{order['_id']}}">{{order['_id']}}</a>
+          </td>
+          <td>{{order['order_date_time'].strftime('%Y-%m-%d %I:%M %p')}}</td>
+          <td>$&nbsp;{{order['order_amount']}}</td>
+          <td>{{order['payment'][0]['payment_type']}}</td>
+          <td>{{order['payment'][0]['payment_status']}}</td>
+          <td>{{OrderStatus(order['order_status']).name | replace("_", " ")}}</td>
+        </tr>
+
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Set Commission Percentage</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/admin/restaurant/approve/" method="POST">
+          <input type="hidden" name="restaurantId" id="restaurantId">
+          <div class="mb-3">
+            <label for="commissionPercentage" class="form-label required">Commission (%)</label>
+            <input type="number" name="commissionPercentage" id="commissionPercentage" class="form-control w-50"
+              required>
+          </div>
+          <button type="submit" class="btn btn-success">Approve</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+{% endblock %}

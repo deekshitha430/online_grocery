@@ -1,0 +1,37 @@
+{% set curPage = 'register' %}
+{% set title = 'Register' %}
+
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+
+<main class="container d-flex my-5">
+  <fieldset class="user-register bg-light border">
+    <legend class="float-none w-auto px-2">Signup & get great discounts</legend>
+    <p class="mb-4">Already have an account? <a href="/login">Login</a></p>
+    <form action="{{request.url}}" method="POST" id="user-registration">
+
+      <div class="mb-4">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control" placeholder="Email" required>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required>
+      </div>
+
+      <div class="mb-5">
+        <label for="confirm_password" class="form-label">Confirm Password</label>
+        <input type="password" name="confirm_password" id="confirm_password" class="form-control"
+          placeholder="Confirm Password" required>
+      </div>
+
+      <button type="submit" class="btn btn-success w-100 mb-3">Register Now</button>
+
+    </form>
+  </fieldset>
+</main>
+
+
+{% endblock %}

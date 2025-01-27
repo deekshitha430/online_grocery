@@ -1,0 +1,139 @@
+{% set curPage = 'home' %}
+{% set title = 'View Product Details' %}
+
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+
+<main>
+
+  <section class="products container-fluid mb-5" id="products">
+    <h3 class="text-success text-center my-3">View Product Details</h3>
+
+    <div class="bg-white p-3">
+      <div class="row mb-5">
+        <div class="col-sm-8">
+          <div>
+            <h6>{{product['brand_name']}}</h6>
+            <h5>{{product['product_title']}}</h5>
+            <div class="my-5">
+              <h4 class="d-flex align-items-center gap-3">
+                <span>Price : $ {{product['price']}}</span>
+                {% if product['mrp'] %}
+                <span class="text-secondary text-decoration-line-through fs-6">( $ {{product['mrp']}} )</span>
+                {% endif %}
+              </h4>
+            </div>
+
+            {% if isIdInSession(product['_id']) %}
+            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"
+              data-bs-product_id="{{product['_id']}}" data-bs-product_title="{{product['product_title']}}"
+              onclick="updateMenuQty(this)" class="btn btn-sm btn-danger w-25">ADDED <span
+                class="badge"></span></button>
+            {% else %}
+            <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"
+              data-bs-product_id="{{product['_id']}}" data-bs-product_title="{{product['product_title']}}"
+              onclick="updateMenuQty(this)" class="btn btn-sm btn-success w-25">+ ADD</button>
+            {% endif %}
+
+            <div class="my-3">
+              <h5>Description</h5>
+              <p>{{product['description']}}</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="col-sm-4">
+          <div>
+            <img src="../../static/images/uploads/products/{{product['img_file_name']}}" alt=""
+              style="width: 100%;height:350px">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <h5>Rating & Reviews</h5>
+        <div class="d-flex flex-wrap gap-3">
+
+          {% for review in product['reviews'] %}
+          
+          <div class="border p-3" style="width: 22rem;">
+            <div class="star-rating mb-3">
+              <input type="radio" id="5-stars-{{loop.index}}" name="rating_{{loop.index}}" value="5" {{'checked' if review['rating']==5}} />
+              <label for="5-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="4-stars-{{loop.index}}" name="rating_{{loop.index}}" value="4" {{'checked' if review['rating']==4}} />
+              <label for="4-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="3-stars-{{loop.index}}" name="rating_{{loop.index}}" value="3" {{'checked' if review['rating']==3}} />
+              <label for="3-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="2-stars-{{loop.index}}" name="rating_{{loop.index}}" value="2" {{'checked' if review['rating']==2}} />
+              <label for="2-stars-{{loop.index}}" class="star">&#9733;</label>
+              <input type="radio" id="1-stars-{{loop.index}}" name="rating_{{loop.index}}" value="1" {{'checked' if review['rating']==1}} />
+              <label for="1-stars-{{loop.index}}" class="star">&#9733;</label>
+            </div>
+            <div>
+              <q>{{review['review']}}</q>
+              <div class="my-3 text-end"> - {{review['user']['full_name']}}</div>
+            </div>
+          
+          </div>         
+          
+          {% endfor %}
+          
+
+        </div>
+      </div>
+
+  </section>
+
+
+</main>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-light">
+        <h6 class="modal-title" id="exampleModalLabel" style="text-align: center;">Update Quantity for <span
+            id="product_title"></span></h6>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="{{request.url}}" method="post">
+
+          <div class="row justify-content-center">
+            <div class="col-sm-4">
+              <div class="input-group mb-3">
+                <button class="btn btn-danger" type="button" id="btn-decr" onclick="decrementValue()"
+                  disabled>-</button>
+                <input type="number" min="1" name="quantity" id="quantityInp" class="form-control" value="1" />
+                <button class="btn btn-danger" type="button" id="btn-incr" onclick="incrementValue()">+</button>
+              </div>
+              <input type="hidden" name="product_id" id="product_id">
+            </div>
+            <div class="col-sm-4">
+              <button type="submit" class="btn btn-primary me-0">Add to cart</button>
+            </div>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+
+{% block scripts%}
+
+<script>
+  function updateMenuQty(identifier) {
+    var product_id = $(identifier).attr("data-bs-product_id");
+    var product_title = $(identifier).attr("data-bs-product_title");
+    $("#product_id").val(product_id);
+    $("#product_title").text(product_title);
+  }
+</script>
+
+{% endblock %}

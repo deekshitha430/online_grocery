@@ -1,0 +1,187 @@
+{% set curPage = 'orderDetails' %}
+{% set title = 'Order Details' %}
+
+{% extends "/user/base/base.html" %}
+
+{% block content %}
+
+<div class="container bg-light my-4 p-4">
+  <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/" class=" text-decoration-none">Home</a></li>
+      <li class="breadcrumb-item"><a href="/orders/" class=" text-decoration-none">Orders</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Order Details</li>
+    </ol>
+  </nav>
+  <h4 class="page-title ">{{title}}</h4>
+
+  <div class="order-details">
+    {% if order['order_status'] != OrderStatus['DELIVERED'].value and order['order_status'] != OrderStatus['PICKED_UP'].value and order['order_status'] != OrderStatus['CANCELLED'].value %}
+    <div class="mb-3">
+      <a href="/cancel-order/{{order['_id']}}/" class="btn btn-sm btn-danger"
+        onclick="return confirm('Do you want to cancel this order?')"> Cancel Order</a>
+    </div>
+    {% endif %}
+
+    <div class="row">
+      <div class="col-sm-4">
+        <ul class="list-unstyled">
+          <li class="mb-2">Order Id : <strong># {{order['_id']}}</strong></li>
+          <li class="mb-2">Order Status : {{OrderStatus(order['order_status']).name | replace("_", " ")}}</li>
+          <li class="mb-1">Order Type : {{order['order_type']}}</li>
+          <li class="mb-1">Order Amount : $ {{order['order_amount']}}</li>
+        </ul>
+
+        <h6 class="mt-4 mb-2 fw-bold">Payment Details</h6>
+        <ul class="list-unstyled">
+          <li class="mb-1">Payment Type : {{order['payment'][0]['payment_type']}}</li>
+          <li class="mb-2">Payment Status : {{order['payment'][0]['payment_status']}}</li>
+          {% if order['payment'][0]['cancellation_charge'] %}
+          <li class="mb-1">Order Cancellation Fee : $ {{'%0.2f'%order['payment'][0]['cancellation_charge']|float}}</li>
+          <li class="mb-1">Refund Amount : $ {{'%0.2f'%order['payment'][0]['refund_amount']|float}}</li>
+          {% endif %}
+        </ul>
+      </div>
+      <div class="col-sm-8">
+        <h6 class="fw-bold mt-2 mb-4">Ordered Items</h6>
+        <table class="table table-bordered">
+          <thead>
+            <th>#</th>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+            {% if order['order_status'] == OrderStatus['DELIVERED'].value or order['order_status'] == OrderStatus['PICKED_UP'].value%}
+            <th>Review</th>
+            {% endif %}
+          </thead>
+          <tbody>
+            {% for item in orderedItems %}
+            <tr>
+              <td>{{loop.index}}</td>
+              <td>{{item['product'][0]['product_title']}}</td>
+              <td>{{item['quantity']}}</td>
+              <td>$&nbsp;{{'%0.2f'%item['price']|float}}</td>
+              <td>$&nbsp;{{'%0.2f'%item['amount']|float}}</td>
+              {% if order['order_status'] == OrderStatus['DELIVERED'].value or order['order_status'] == OrderStatus['PICKED_UP'].value%}
+              <td>
+                <button type="button" class="btn btn-sm btn-warning" data-bs-toggle="modal"
+                  data-bs-target="#productReviewModal" onclick="getSetValues(`{{item['product_id']}}`)">Rate &
+                  review</button>
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+            <tr>
+              <td colspan="4" class="text-end">Total</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['items_total_amt']|float}}</td>
+            </tr>
+            <tr>
+              <td colspan="4" class="text-end">Tax</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['tax_amount']|float}}</td>
+            </tr>
+            {% if order['payment'][0]['delivery_charge'] %}
+            <tr>
+              <td colspan="4" class="text-end">Delivery Charge</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['delivery_charge']|float}}</td>
+            </tr>
+            {% endif %}
+            <tr>
+              <td colspan="4" class="text-end">Grand Total</td>
+              <td>$ {{'%0.2f'%order['payment'][0]['order_amount']|float}}</td>
+            </tr>
+
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- Product Review Modal -->
+<div class="modal fade" id="productReviewModal" tabindex="-1" aria-labelledby="productReviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productReviewModalLabel">Rating & Review</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form action="/product-review/" method="post">
+          <div class="star-rating mb-3">
+            <input type="radio" id="5-stars" name="rating" value="5" required />
+            <label for="5-stars" class="star">&#9733;</label>
+            <input type="radio" id="4-stars" name="rating" value="4" />
+            <label for="4-stars" class="star">&#9733;</label>
+            <input type="radio" id="3-stars" name="rating" value="3" />
+            <label for="3-stars" class="star">&#9733;</label>
+            <input type="radio" id="2-stars" name="rating" value="2 " />
+            <label for="2-stars" class="star">&#9733;</label>
+            <input type="radio" id="1-stars" name="rating" value="1" />
+            <label for="1-stars" class="star">&#9733;</label>
+          </div>
+          <div class="mb-3">
+            <label for="review" class="form-label">Review</label>
+            <textarea name="review" id="review" class="form-control" cols="30" rows="3"></textarea>
+          </div>
+          <input type="hidden" name="review_id" id="review_id" placeholder="review id">
+          <input type="hidden" name="product_id" id="product_id" placeholder="product id">
+          <input type="hidden" name="order_id" id="order_id" value="{{order['_id']}}" placeholder="order id">
+          <button type="submit" class="btn btn-success">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function getSetValues(product_id) {
+
+    $("#product_id").val(product_id)
+    var order_id = $("#order_id").val()
+    // Fetch ratings and review if already given
+    $.get("/get-product-review/",
+      { order_id: order_id, product_id: product_id },
+      function (result) {
+        if (result) {
+          switch (result["rating"]) {
+            case 5: $("#5-stars ").attr("checked", "checked"); break;
+            case 4: $("#4-stars ").attr("checked", "checked"); break;
+            case 3: $("#3-stars ").attr("checked", "checked"); break;
+            case 2: $("#2-stars ").attr("checked", "checked"); break;
+            case 1: $("#1-stars ").attr("checked", "checked"); break;
+          }
+          $("#review").val(result['review'])
+          $("#review_id").val(result['_id']['$oid'])
+        }
+      });
+  }
+
+  function getSetRestValues() {
+    var restaurantId = $("#rest_restaurantId").val();
+    // Fetch ratings and review if already given
+    $.get("/user/get-restaurant-review/",
+      { restaurantId: restaurantId },
+      function (result) {
+        if (result) {
+          switch (result["rating"]) {
+            case 5: $("#5-stars-rest").attr("checked", "checked"); break;
+            case 4: $("#4-stars-rest").attr("checked", "checked"); break;
+            case 3: $("#3-stars-rest").attr("checked", "checked"); break;
+            case 2: $("#2-stars-rest").attr("checked", "checked"); break;
+            case 1: $("#1-stars-rest").attr("checked", "checked"); break;
+          }
+          $("#rest_review").val(result['review'])
+          $("#rest_reviewId").val(result['_id']['$oid'])
+        }
+      });
+
+  }
+</script>
+{% endblock %}

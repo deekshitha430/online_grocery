@@ -1,0 +1,89 @@
+{% set curPage = 'categories' %}
+{% set title = 'Categories' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+  <ol class="breadcrumb mt-2">
+    <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+    <li class="breadcrumb-item active" aria-current="page">categories</li>
+  </ol>
+</nav>
+
+<fieldset class="border bg-light mb-5 pb-4">
+  <legend class="float-none w-auto p-2 fs-6">{{'Update' if category else 'Add'}} Categories</legend>
+  <form action="/admin/categories/" method="POST" enctype="multipart/form-data">
+    <div class="row g-3 align-items-center justify-content-center">
+      <div class="col-auto">
+        <label for="name" class="col-form-label">Name</label>
+      </div>
+      <div class="col-auto">
+        <input type="hidden" name="category_id" value="{{category['_id']}}">
+        <input type="text" name="name" id="name" class="form-control" value="{{category['name']}}" required
+          placeholder="Category name" autocomplete="off">
+      </div>
+      <div class="col-auto">
+        <label for="image" class="col-form-label">Image</label>
+      </div>
+      <div class="col-auto">
+        <input type="file" name="image" id="image" class="form-control" {{'required' if not category}}
+          placeholder="Category Image">
+          <input type="hidden" name="img_file_name" value="{{category['img_file_name']}}">
+      </div>
+      <div class="col-auto">
+        <button class="btn btn-sm btn-success">Save</button>
+      </div>
+      {% if category %}
+      <div class="col-auto">
+        <a href="/admin/categories/" class="btn btn-sm btn-warning">Cancel</a>
+      </div>
+      {% endif %}
+    </div>
+  </form>
+</fieldset>
+
+<fieldset class="border bg-light mb-2 shadow p-3">
+  <legend class="float-none w-auto p-2 fs-6">Cities List</legend>
+  <div class="table-responsive">
+    <table class="table table-bordered" id="table">
+      <thead>
+        <tr class="primary-bg text-light">
+          <td style="width:10%">S.No</td>
+          <td style="width:10%"></td>
+          <td>City Name</td>
+          <td>Sub Categories</td>
+          <td style="width: 10%;">Action</td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cat in categories %}
+        <tr>
+          <td>{{loop.index}}</td>
+          <td>
+            <img src="../../static/images/uploads/categories/{{cat['img_file_name']}}" alt="category" style="width:100%">
+          </td>
+          <td>{{cat['name']}}</td>
+          <td>
+            <a href="/admin/sub-categories/?cid={{cat['_id']}}" class="btn btn-sm btn-primary">Sub Categories -></a>
+          </td>
+          <td>
+            <a href="/admin/edit-category/?id={{cat['_id']}}" class="btn btn-sm btn-info" title="Edit category">
+              <i class="fas fa-edit fa-fw"></i>
+            </a>
+            <a href="/admin/delete-category/?id={{cat['_id']}}"
+              onclick="return confirm('Deleting this category will also delete all the sub categories and products associated with this category, Are you sure to delete?')" class="btn btn-sm btn-danger"
+              title="Delete category">
+              <i class="fas fa-close fa-fw"></i>
+            </a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</fieldset>
+
+
+{% endblock %}

@@ -1,0 +1,120 @@
+{% set curPage = 'saveProduct' %}
+{% set title = 'Update' if product else 'Add' %}
+
+{% extends "/admin/base/base.html" %}
+
+{% block content %}
+
+<div class="border bg-light p-4 my-2">
+
+  <nav style="--bs-breadcrumb-divider: '/';" aria-label="breadcrumb">
+    <ol class="breadcrumb mt-2">
+      <li class="breadcrumb-item"><a href="/admin/dashboard" class=" text-decoration-none">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="/admin/products/" class=" text-decoration-none">Products</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Product</li>
+    </ol>
+  </nav>
+
+  <div class="mt-2">
+    <fieldset class="border p-2">
+      <legend class="float-none w-auto p-2 fs-5">{{'Update' if product else 'Add'}} Product</legend>
+
+      <div class="w-75 m-auto">
+        <form action="/admin/product/" method="post" enctype="multipart/form-data" id="productForm">
+          <div class="row mb-3">
+            <div class="col-sm mb-3 mb-sm-0">
+              <label for="category_id" class="form-label">Select Category</label>
+              <select name="category_id" class="form-select" id="category_id">
+                <option value="">--Select--</option>
+                {% for cat in categories %}
+                <option value="{{cat['_id']}}" {{'selected' if product['category_id'] == cat['_id']}}>{{cat['name']}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-sm">
+              <label for="sub_category_id" class="form-label">Select Sub Category</label>
+              <select name="sub_category_id" class="form-select" id="sub_category_id">
+                <option value="">--Select--</option>
+                {% if product %}
+                  {% for scat in product['sub_category'] %}
+                    <option value="{{scat['_id']}}" {{'selected' if product['sub_category_id'] == scat['_id']}}>{{scat['name']}}</option>
+                  {% endfor %}
+                {% endif%}
+              </select>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-sm">
+              <label for="brand_name" class="form-label ">Brand Name</label>
+              <input type="text" name="brand_name" id="brand_name" class="form-control" value="{{product['brand_name']}}" />
+            </div>
+            <div class="col-sm">
+              <label for="product_image" class="form-label">Product Image</label>
+              <input type="file" name="product_image" id="product_image" class="form-control" {{'required' if not product}} />
+              <input type="hidden" name="img_file_name" value="{{product['img_file_name']}}">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="product_title" class="form-label required">Product Title</label>
+            <input type="text" name="product_title" id="product_title" class="form-control" value="{{product['product_title']}}" required />
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-sm">
+              <label for="mrp" class="form-label required">MRP</label>
+              <input type="text" name="mrp" id="mrp" class="form-control" value="{{product['mrp']}}" />
+            </div>
+            <div class="col-sm">
+              <label for="price" class="form-label required">Price</label>
+              <input type="text" name="price" id="price" class="form-control" value="{{product['price']}}" required />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea name="description" id="description" rows="3" class="form-control">{{product['description']}}</textarea>
+          </div>
+
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="True" name="is_returnable" id="is_returnable" {{'checked' if product['is_returnable']}}>
+              <label class="form-check-label" for="is_returnable">
+                Is Returnable?
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <input type="hidden" name="product_id" value="{{product['_id']}}">
+            <button class="btn btn-success w-50">Save</button>
+          </div>
+        </form>
+      </div>
+    </fieldset>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts%}
+
+<script>
+  $("#category_id").change(function(){
+    $("#sub_category_id").empty();
+    var category_id = this.value;
+    $.get("/admin/get-sub-category/",{category_id:category_id}, function(result){
+      if(result)
+      {
+        $.each(result, function(key, value){
+          $("#sub_category_id").append($("<option>").val(value['_id']['$oid']).text(value['name']))
+        })
+        
+      }
+    })
+  })
+</script>
+
+{% endblock %}
